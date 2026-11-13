@@ -2,6 +2,10 @@
 
 一个自用的校招投递记录工具：记录每一次投递的公司、岗位、渠道与进度，用看板看清投递量、面试转化率和渠道效果。
 
+![界面截图](docs/screenshot.png)
+
+> 截图为演示数据。12 条记录、4 个投递渠道，展示看板、图表与列表的完整形态。
+
 ## 功能
 
 - **账号登录**：首次启动可注册一个账号，之后注册入口自动关闭；会话 7 天有效
@@ -110,6 +114,8 @@ job-tracker/
     ├── conftest.py     # app / client / auth_client fixture
     ├── test_auth.py
     └── test_api.py
+docs/
+└── screenshot.png      # README 界面截图（演示数据）
 ```
 
 ## 设计说明
@@ -121,6 +127,25 @@ job-tracker/
 - **前端防 XSS**：表格内容全部通过 `textContent` 写入，不使用 `innerHTML`
 - **会话安全**：Cookie 设置 `HttpOnly` + `SameSite=Lax`；登录失败不区分「账号不存在」和「密码错误」
 - **分页越界处理**：删除最后一页的最后一条后，后端把页码回退到有效页，避免空白页
+
+## 技术选型权衡
+
+单人自用工具，选型的第一原则是「**部署与维护成本接近零**」，而不是「技术栈看起来先进」。
+
+| 决策 | 选择 | 放弃的方案 | 理由 |
+|---|---|---|---|
+| Web 框架 | Flask | Django | 全项目 10 个接口，Django 的 ORM、Admin、路由分层在这里都是净负担；Flask 一个文件就能看清全部路由 |
+| 数据库 | SQLite 单文件 | MySQL / PostgreSQL | 零安装、零端口、零账号；**整个库就是一个文件，复制即备份**。数据量在万级以内完全够用，超过再迁 |
+| 前端 | 原生 JS + Chart.js | Vue / React | 页面只有一个，引入构建链（node_modules、打包、热更新）换不来任何收益；Chart.js 走 CDN，连 npm 都不用 |
+| 鉴权 | Session Cookie | JWT | 单机单账号，没有多端、没有横向扩展需求；Session 天然支持「服务端登出即失效」，JWT 要做到这点反而要额外维护黑名单 |
+| 更新语义 | `PUT` + 部分字段 | 全量覆盖的 `PUT` | 页面上只改状态时不应要求回传整条记录；后端把校验拆成 `partial` 模式，检查「传了的字段」而不是「所有必填字段」 |
+| 时间戳 | Python `ZoneInfo` 生成 | SQLite `datetime('now','localtime')` | `localtime` 依赖宿主机时区，代码搬到 UTC 服务器后日期会整体偏移一天；时区由应用层掌握，数据库只管存 |
+
+**什么时候该换掉这些选择**，也一并写清楚：
+
+- 记录涨到 10 万条以上 → 列表必须分页之外再加索引优化，或直接迁 PostgreSQL
+- 需要多人协作 → `applications` 加 `user_id` 做数据隔离，SQLite 的单写锁也会开始成为瓶颈
+- 要部署到公网 → 换 waitress / gunicorn 跑多进程，`SECRET_KEY` 换成随机值，补 CSRF token 与 HTTPS
 
 ## 已知限制
 
