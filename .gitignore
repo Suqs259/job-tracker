@@ -1,0 +1,35 @@
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+
+# ---- 虚拟环境 ----
+.venv/
+venv/
+env/
+ENV/
+
+# ---- 数据库（本地数据，不入库）----
+data/
+*.db
+*.sqlite3
+*.sqlite
+
+# ---- 日志与密钥 ----
+*.log
+.env
+.env.*
+config.local.py
+
+# ---- IDE / 系统 ----
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db
+
+# ---- 缓存 ----
+.pytest_cache/
+.mypy_cache/

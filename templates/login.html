@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>登录 · 校招投递管理台</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="auth-body">
+  <div class="auth-card">
+    <h1>校招投递管理台</h1>
+    <p class="muted" id="auth-subtitle">正在检查初始化状态...</p>
+
+    <form id="auth-form" hidden>
+      <label>用户名
+        <input type="text" id="auth-username" autocomplete="username" required minlength="3" maxlength="20">
+      </label>
+      <label>密码
+        <input type="password" id="auth-password" autocomplete="current-password" required minlength="6">
+      </label>
+      <p class="form-error" id="auth-error" hidden></p>
+      <button type="submit" class="btn btn-primary btn-block" id="auth-submit">登录</button>
+    </form>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/login.js') }}"></script>
+</body>
+</html>
